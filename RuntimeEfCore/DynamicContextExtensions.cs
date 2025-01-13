@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.Linq.Dynamic.Core;
 
 namespace RuntimeEfCore
 {
@@ -53,33 +54,36 @@ namespace RuntimeEfCore
                 var context = await listener.GetContextAsync();
                 try
                 {
-
                     var request = context.Request;
                     var response = context.Response;
 
                     Console.WriteLine($"İstek alındı: {request.HttpMethod} {request.RawUrl}");
+
                     if (request.HttpMethod == "GET")
                     {
-                        var entites = GetEntity(request.RawUrl.Replace("/", ""));
-                        string responseString = "Hello, World!";
-                        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(entites));
+                        var entityName = request.RawUrl.Split('?')[0].Replace("/", "");
+                        var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
 
-                        response.ContentType = "application/json; charset=utf-8"; // JSON formatında UTF-8 olarak ayarlandı
+                        var entities = GetEntity(entityName).AsQueryable();
+
+                        // ODATA destekli sorgu işlemleri
+                        entities = (IQueryable<object>)ApplyODataQuery(entities, query);
+
+                        string responseString = JsonConvert.SerializeObject(entities);
+                        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+
+                        response.ContentType = "application/json; charset=utf-8";
                         response.ContentEncoding = System.Text.Encoding.UTF8;
                         response.ContentLength64 = buffer.Length;
 
-                        // Yanıtı gönder
                         response.OutputStream.Write(buffer, 0, buffer.Length);
                         response.OutputStream.Close();
                     }
-
                 }
                 catch (Exception ex)
                 {
-
                     Console.WriteLine($"Hata: {ex.Message}");
 
-                    // Hata yanıtı
                     var response = context.Response;
                     response.StatusCode = 400; // HTTP 400 Bad Request
                     response.ContentType = "application/json; charset=utf-8";
@@ -91,9 +95,41 @@ namespace RuntimeEfCore
                     response.OutputStream.Write(buffer, 0, buffer.Length);
                     response.OutputStream.Close();
                 }
-
             }
         }
+        // ...
+
+        public static IQueryable ApplyODataQuery(IQueryable entities, System.Collections.Specialized.NameValueCollection query)
+        {
+            // $filter
+            if (query["$filter"] != null)
+            {
+                entities = entities.Where(query["$filter"]);
+                var list = new List<object>();
+                
+            }
+
+            // $orderby
+            if (query["$orderby"] != null)
+            {
+                entities = entities.OrderBy(query["$orderby"]);
+            }
+
+            // $skip
+            if (query["$skip"] != null && int.TryParse(query["$skip"], out int skip))
+            {
+                entities = entities.Skip(skip);
+            }
+
+            // $top
+            if (query["$top"] != null && int.TryParse(query["$top"], out int top))
+            {
+                entities = entities.Take(top);
+            }
+
+            return entities;
+        }
+
         public static IEnumerable<object> GetEntity(string entityName)
         {
             entityName = "TypedDataContext.Models." + entityName;
