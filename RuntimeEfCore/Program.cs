@@ -19,6 +19,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace RuntimeEfCore
 {
@@ -54,21 +57,63 @@ namespace RuntimeEfCore
             while (listener.IsListening)
             {
                 var context = await listener.GetContextAsync();
-                var request = context.Request;
-                var response = context.Response;
+                try
+                {
+                    
+                    var request = context.Request;
+                    var response = context.Response;
 
-                Console.WriteLine($"İstek alındı: {request.HttpMethod} {request.RawUrl}");
+                    Console.WriteLine($"İstek alındı: {request.HttpMethod} {request.RawUrl}");
+                    if (request.HttpMethod == "GET")
+                    {
+                        var entites = GetEntity(request.RawUrl.Replace("/", ""));
+                        string responseString = "Hello, World!";
+                        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(entites));
 
-                // Basit bir "Hello, World!" yanıtı gönder
-                string responseString = "Hello, World!";
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+                        response.ContentType = "application/json; charset=utf-8"; // JSON formatında UTF-8 olarak ayarlandı
+                        response.ContentEncoding = System.Text.Encoding.UTF8;
+                        response.ContentLength64 = buffer.Length;
 
-                response.ContentLength64 = buffer.Length;
-                response.OutputStream.Write(buffer, 0, buffer.Length);
-                response.OutputStream.Close();
+                        // Yanıtı gönder
+                        response.OutputStream.Write(buffer, 0, buffer.Length);
+                        response.OutputStream.Close();
+                    }
+                   
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine($"Hata: {ex.Message}");
+
+                    // Hata yanıtı
+                    var response = context.Response;
+                    response.StatusCode = 400; // HTTP 400 Bad Request
+                    response.ContentType = "application/json; charset=utf-8";
+
+                    string errorResponse = JsonConvert.SerializeObject(new { error = ex.Message });
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(errorResponse);
+
+                    response.ContentLength64 = buffer.Length;
+                    response.OutputStream.Write(buffer, 0, buffer.Length);
+                    response.OutputStream.Close();
+                }
+               
             }
         }
-        private static void DynamicContext(out bool enableLazyLoading, out AssemblyLoadContext assemblyLoadContext)
+        public static IEnumerable<object> GetEntity(string entityName)
+        {
+            entityName = "TypedDataContext.Models." + entityName;
+            var entityTypes = dynamicContext.Model.GetEntityTypes();
+            if(entityTypes.All(e => e.Name != entityName))
+            {
+               throw new Exception($"Entity type: {entityName} not found");
+            }
+            var items = (IQueryable<object>)dynamicContext.Query(entityName);
+            return items.ToList();
+        }
+        
+        public static DbContext dynamicContext;
+        public static void DynamicContext(out bool enableLazyLoading, out AssemblyLoadContext assemblyLoadContext)
         {
             MemoryStream peStream;
             var connectionString = "Data Source=ISMAIL\\SQLEXPRESS;Initial Catalog=MyCityTransportMainDb;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False";
@@ -113,12 +158,11 @@ namespace RuntimeEfCore
             var constr = type.GetConstructor(Type.EmptyTypes);
             _ = constr ?? throw new Exception("DataContext ctor not found");
 
-            DbContext dynamicContext = (DbContext)constr.Invoke(null);
+             dynamicContext = (DbContext)constr.Invoke(null);
             var entityTypes = dynamicContext.Model.GetEntityTypes();
-
             Console.WriteLine($"Context contains {entityTypes.Count()} types");
 
-            foreach (var entityType in dynamicContext.Model.GetEntityTypes())
+            foreach (var entityType in entityTypes)
             {
                 var items = (IQueryable<object>)dynamicContext.Query(entityType.Name);
 
@@ -127,7 +171,7 @@ namespace RuntimeEfCore
         }
 
         [SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "We need it")]
-        static IReverseEngineerScaffolder CreateMssqlScaffolder() =>
+        public static IReverseEngineerScaffolder CreateMssqlScaffolder() =>
             new ServiceCollection()
                .AddEntityFrameworkSqlServer()
                .AddLogging()
@@ -145,7 +189,7 @@ namespace RuntimeEfCore
                .GetRequiredService<IReverseEngineerScaffolder>();
 
 
-        static List<MetadataReference> CompilationReferences(bool enableLazyLoading)
+        public static List<MetadataReference> CompilationReferences(bool enableLazyLoading)
         {
             var refs = new List<MetadataReference>();
             var referencedAssemblies = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
@@ -165,7 +209,7 @@ namespace RuntimeEfCore
             return refs;
         }
 
-        private static CSharpCompilation GenerateCode(List<string> sourceFiles, bool enableLazyLoading)
+        public static CSharpCompilation GenerateCode(List<string> sourceFiles, bool enableLazyLoading)
         {
             var options = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp10);
 
