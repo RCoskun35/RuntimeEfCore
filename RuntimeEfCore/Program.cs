@@ -188,7 +188,7 @@ namespace RuntimeEfCore
         static readonly MethodInfo SetMethod =
             typeof(DbContext).GetMethod(nameof(DbContext.Set), 1, new[] { typeof(string) }) ??
             throw new Exception($"Type not found: DbContext.Set");
-
+        //a
         public static IQueryable Query(this DbContext context, string entityName, Type entityType) =>
             (IQueryable)SetMethod.MakeGenericMethod(entityType)?.Invoke(context, new[] { entityName }) ??
             throw new Exception($"Type not found: {entityType.FullName}");
