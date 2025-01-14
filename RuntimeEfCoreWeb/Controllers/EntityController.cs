@@ -9,12 +9,27 @@ namespace RuntimeEfCoreWeb.Controllers
     [ApiController]
     public class EntityController : ControllerBase
     {
+        /// <summary>
+        /// Get all items of a specific entity.
+        /// </summary>
+        /// <param name="entityName">The name of the entity to retrieve items from.</param>
+        /// <returns>List of items from the specified entity.</returns>
         [HttpGet]
         public IActionResult Get(string entityName)
         {
             var items = DynamicContextExtensions.GetEntity(entityName);
             return Ok(items);
         }
+
+
+
+        /// <summary>
+        /// Get a specific item by its ID.
+        /// </summary>
+        /// <param name="entityName">The name of the entity.</param>
+        /// <param name="id">The ID of the item to retrieve.</param>
+        /// <returns>The item with the specified ID.</returns>
+        /// 
         [HttpGet("{id}")]
         public IActionResult GetById(string entityName, string id)
         {
@@ -23,6 +38,13 @@ namespace RuntimeEfCoreWeb.Controllers
             return Ok(item);
         }
 
+
+        /// <summary>
+        /// Create a new item in the specified entity.
+        /// </summary>
+        /// <param name="entityName">The name of the entity.</param>
+        /// <param name="item">The item to be created.</param>
+        /// <returns>The created item.</returns>
         [HttpPost]
         public IActionResult Post(string entityName, [FromBody] object item)
         {
@@ -41,6 +63,14 @@ namespace RuntimeEfCoreWeb.Controllers
             DynamicContextExtensions.dynamicContext.SaveChanges();
             return CreatedAtAction(nameof(GetById), new { entityName, id = deserializedItem.GetType().GetProperty("Id")?.GetValue(deserializedItem)?.ToString() }, deserializedItem);
         }
+
+        /// <summary>
+        /// Update an existing item by its ID.
+        /// </summary>
+        /// <param name="entityName">The name of the entity.</param>
+        /// <param name="id">The ID of the item to update.</param>
+        /// <param name="item">The updated item data.</param>
+        /// <returns>The updated item.</returns>
         [HttpPut("{id}")]
         public IActionResult Put(string entityName, string id, [FromBody] object item)
         {
@@ -103,7 +133,12 @@ namespace RuntimeEfCoreWeb.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Delete an item by its ID.
+        /// </summary>
+        /// <param name="entityName">The name of the entity.</param>
+        /// <param name="id">The ID of the item to delete.</param>
+        /// <returns>Confirmation of the deletion.</returns>
         [HttpDelete("{id}")]
         public IActionResult Delete(string entityName, string id)
         {

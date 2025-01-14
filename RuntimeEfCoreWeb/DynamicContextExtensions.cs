@@ -95,6 +95,10 @@ namespace RuntimeEfCoreWeb
             _ = constr ?? throw new Exception("DataContext ctor not found");
 
             dynamicContext = (DbContext)constr.Invoke(null);
+
+            
+
+
             var entityTypes = dynamicContext.Model.GetEntityTypes();
             Console.WriteLine($"Context contains {entityTypes.Count()} types");
 
