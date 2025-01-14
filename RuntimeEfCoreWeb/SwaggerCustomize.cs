@@ -45,28 +45,7 @@ public class SwaggerCrudOperationFilter : IOperationFilter
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (operation.Tags == null)
-            operation.Tags = new List<OpenApiTag>();
-
-        // CRUD operasyonu için özet açıklaması ekliyoruz
-        operation.Tags.Add(new OpenApiTag { Name = $"{_method} {_route}" });
-
-        if (_method == "GET")
-        {
-            operation.Summary = $"Retrieve all {_entityName} items";
-        }
-        else if (_method == "POST")
-        {
-            operation.Summary = $"Create a new {_entityName} item";
-        }
-        else if (_method == "PUT")
-        {
-            operation.Summary = $"Update an existing {_entityName} item";
-        }
-        else if (_method == "DELETE")
-        {
-            operation.Summary = $"Delete an existing {_entityName} item";
-        }
+        operation.Tags.Add(new OpenApiTag { Name = $"{_route}" });
     }
 }
 
