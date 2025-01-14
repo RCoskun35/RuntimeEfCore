@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuntimeEfCore", "RuntimeEfCore\RuntimeEfCore.csproj", "{EF434E98-64FE-4AC4-BF88-6BE137DAB0CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuntimeEfCoreLibrary", "RuntimeEfCoreLibrary\RuntimeEfCoreLibrary.csproj", "{3222617D-6CFD-4740-8D25-755CCA66F4F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuntimeEfCoreWeb", "RuntimeEfCoreWeb\RuntimeEfCoreWeb.csproj", "{0AC6BACC-B591-4334-B85D-AE75E057AB41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{EF434E98-64FE-4AC4-BF88-6BE137DAB0CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF434E98-64FE-4AC4-BF88-6BE137DAB0CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF434E98-64FE-4AC4-BF88-6BE137DAB0CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3222617D-6CFD-4740-8D25-755CCA66F4F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3222617D-6CFD-4740-8D25-755CCA66F4F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3222617D-6CFD-4740-8D25-755CCA66F4F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3222617D-6CFD-4740-8D25-755CCA66F4F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AC6BACC-B591-4334-B85D-AE75E057AB41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AC6BACC-B591-4334-B85D-AE75E057AB41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AC6BACC-B591-4334-B85D-AE75E057AB41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AC6BACC-B591-4334-B85D-AE75E057AB41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
