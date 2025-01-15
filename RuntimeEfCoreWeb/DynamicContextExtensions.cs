@@ -33,7 +33,7 @@ namespace RuntimeEfCoreWeb
         public static IQueryable Query(this DbContext context, string entityName, Type entityType) =>
             (IQueryable)SetMethod.MakeGenericMethod(entityType)?.Invoke(context, new[] { entityName }) ??
             throw new Exception($"Type not found: {entityType.FullName}");
-       
+
 
         public static IQueryable<object> GetEntity(string entityName)
         {
@@ -54,7 +54,7 @@ namespace RuntimeEfCoreWeb
         public static void DynamicContext(string connectionString)
         {
             MemoryStream peStream;
-            
+
 
             var scaffolder = CreateMssqlScaffolder();
 
@@ -98,7 +98,7 @@ namespace RuntimeEfCoreWeb
 
             dynamicContext = (DbContext)constr.Invoke(null);
 
-            
+
 
 
             var entityTypes = dynamicContext.Model.GetEntityTypes();
@@ -121,18 +121,21 @@ namespace RuntimeEfCoreWeb
                 // Varlık türünü alın
                 var clrType = entityType.ClrType;
 
+                // Birincil anahtarı kontrol et
+                var primaryKey = entityType.FindPrimaryKey();
+                if (primaryKey == null)
+                {
+                    // Anahtar olmayan varlıkları atla
+                    continue;
+                }
+
                 // OData'da varlık seti oluştur
                 var entitySet = builder.AddEntitySet(entityType.Name.Replace("TypedDataContext.Models.", ""), builder.AddEntityType(clrType));
+
                 foreach (var property in entityType.GetProperties())
                 {
                     // Tüm özellikleri EDM modeline ekle
                     entitySet.EntityType.AddProperty(property.PropertyInfo);
-                }
-                // Birincil anahtar kontrolü
-                var primaryKey = entityType.FindPrimaryKey();
-                if (primaryKey == null)
-                {
-                    throw new InvalidOperationException($"The entity '{entityType.Name}' does not have a primary key defined.");
                 }
 
                 // Birincil anahtarı OData modeline ekle
