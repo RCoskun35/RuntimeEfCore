@@ -16,6 +16,8 @@ using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.EntityFrameworkCore.Scaffolding.Internal;
 using Bricelam.EntityFrameworkCore.Design;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 
 namespace RuntimeEfCoreWeb
 {
@@ -33,7 +35,7 @@ namespace RuntimeEfCoreWeb
             throw new Exception($"Type not found: {entityType.FullName}");
        
 
-        public static IEnumerable<object> GetEntity(string entityName)
+        public static IQueryable<object> GetEntity(string entityName)
         {
             entityName = "TypedDataContext.Models." + entityName;
             var entityTypes = dynamicContext.Model.GetEntityTypes();
@@ -42,7 +44,7 @@ namespace RuntimeEfCoreWeb
                 throw new Exception($"Entity type: {entityName} not found");
             }
             var items = (IQueryable<object>)dynamicContext.Query(entityName);
-            return items.ToList();
+            return items; // IQueryable döndürülüyor
         }
 
         public static DbContext dynamicContext;
@@ -109,6 +111,40 @@ namespace RuntimeEfCoreWeb
                 Console.WriteLine($"Entity type: {entityType.Name} contains {items.Count()} items");
             }
         }
+
+        public static IEdmModel GetDynamicEdmModel(DbContext context)
+        {
+            var builder = new ODataConventionModelBuilder();
+
+            foreach (var entityType in context.Model.GetEntityTypes())
+            {
+                // Varlık türünü alın
+                var clrType = entityType.ClrType;
+
+                // OData'da varlık seti oluştur
+                var entitySet = builder.AddEntitySet(entityType.Name.Replace("TypedDataContext.Models.", ""), builder.AddEntityType(clrType));
+                foreach (var property in entityType.GetProperties())
+                {
+                    // Tüm özellikleri EDM modeline ekle
+                    entitySet.EntityType.AddProperty(property.PropertyInfo);
+                }
+                // Birincil anahtar kontrolü
+                var primaryKey = entityType.FindPrimaryKey();
+                if (primaryKey == null)
+                {
+                    throw new InvalidOperationException($"The entity '{entityType.Name}' does not have a primary key defined.");
+                }
+
+                // Birincil anahtarı OData modeline ekle
+                foreach (var property in primaryKey.Properties)
+                {
+                    entitySet.EntityType.HasKey(property.PropertyInfo);
+                }
+            }
+
+            return builder.GetEdmModel();
+        }
+
 
         [SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "We need it")]
         public static IReverseEngineerScaffolder CreateMssqlScaffolder() =>

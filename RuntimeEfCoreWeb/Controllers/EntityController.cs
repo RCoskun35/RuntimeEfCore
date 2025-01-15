@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using Newtonsoft.Json;
 using System.Linq;
 
@@ -7,6 +8,7 @@ namespace RuntimeEfCoreWeb.Controllers
 {
     [Route("api/{entityName}")]
     [ApiController]
+    [EnableQuery]
     public class EntityController : ControllerBase
     {
         [HttpGet]

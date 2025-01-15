@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.ModelBuilder;
 using RuntimeEfCoreWeb;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +8,18 @@ DynamicContextExtensions.DynamicContext(connectionString!);
 // Add services to the container.
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddOData(opt =>
+{
+    var edmModel = DynamicContextExtensions.GetDynamicEdmModel(DynamicContextExtensions.dynamicContext);
+    opt.AddRouteComponents("odata", edmModel)
+        .Filter()
+        .Select()
+        .Count()
+        .Expand()
+        .OrderBy()
+        .SetMaxTop(null);
+        
+});
 
 var dbContext = DynamicContextExtensions.dynamicContext;
 var app = builder.Build();
