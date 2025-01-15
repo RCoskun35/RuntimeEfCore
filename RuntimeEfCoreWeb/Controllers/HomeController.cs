@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RuntimeEfCoreWeb.Models;
 using System.Diagnostics;
 
@@ -15,7 +16,8 @@ namespace RuntimeEfCoreWeb.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var entities = DynamicContextExtensions.dynamicContext.Model.GetEntityTypes().ToList();
+            return View(entities);
         }
 
         public IActionResult Privacy()

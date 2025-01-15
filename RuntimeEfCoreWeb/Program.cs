@@ -1,4 +1,3 @@
-using Microsoft.OpenApi.Models;
 using RuntimeEfCoreWeb;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,10 +7,8 @@ DynamicContextExtensions.DynamicContext(connectionString!);
 
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddEndpointsApiExplorer();
 
 var dbContext = DynamicContextExtensions.dynamicContext;
-builder.Services.AddDynamicCrudEndpoints(dbContext);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -22,8 +19,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseRouting();
 

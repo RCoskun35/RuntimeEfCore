@@ -1,8 +1,295 @@
-﻿@{
+﻿@using Microsoft.EntityFrameworkCore.Metadata
+@model List<IEntityType>
+@{
     ViewData["Title"] = "Home Page";
 }
+@{
+    string GetExample(IProperty item,string method)
+    {
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+        var result = "";
+        if (item.ClrType.Name == "Guid" && method == "PUT")
+        {
+            result = "\"" + item.Name + "\" : " +"\""+Guid.NewGuid().ToString()+"\"" + ",\n";
+        }
+        if (item.ClrType.Name == "Int32")
+        {
+            result = "\"" + item.Name + "\" : " + 0 + ",\n";
+        }
+        else if (item.ClrType.Name == "Decimal")
+        {
+            result = "\"" + item.Name + "\" : " + 0.0 + ",\n";
+        }
+        else if (item.ClrType.Name == "String")
+        {
+            result = "\"" + item.Name + "\" : " + "\"string\"" + ",\n";
+        }
+        else if (item.ClrType.Name == "DateTime")
+        {
+            result = "\"" + item.Name + "\" : " + "\"" + DateTime.Now.ToString("yyyy - MM - dd HH: mm: ss") + "\",\n";
+        }
+        else if (item.ClrType.Name == "Boolean")
+        {
+            result = "\"" + item.Name + "\" : " + false + ",\n";
+        }
+        else if (item.ClrType.Name == "Nullable")
+        {
+            result = "\"" + item.Name + "\":" + null + ",\n";
+        }
+
+
+        return result;
+    }
+}
+<style>
+    textarea {
+    width: 100%;
+    height:100%;
+    min-height: 50px;
+
+    }
+    .btn{
+    width:100px !important;
+    }
+    body {
+    font-family: Arial, sans-serif;
+    }
+    .sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #343a40;
+    color: #fff;
+    position: fixed;
+    }
+    .sidebar a {
+    color: #adb5bd;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    }
+    .sidebar a:hover {
+    background-color: #495057;
+    color: #fff;
+    }
+    .content {
+    margin-left: 250px;
+    padding: 20px;
+    }
+    .endpoint {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    }
+    .endpoint-header {
+    background-color: #f8f9fa;
+    padding: 10px;
+    cursor: pointer;
+    }
+    .endpoint-body {
+    display: none;
+    padding: 15px;
+    }
+
+    .endpoint-list {
+        display: none; 
+    }
+
+    .sidebar {
+        width: 250px;
+        height: 100vh; /* Tam yükseklik */
+        background-color: #343a40;
+        color: #fff;
+        position: fixed; /* Sabit konum */
+        top: 0; /* Üstten hizala */
+        left: 0; /* Soldan hizala */
+        overflow-y: auto; /* Dikey kaydırma */
+    }
+
+        .sidebar a {
+            color: #adb5bd;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+        }
+
+            .sidebar a:hover {
+                background-color: #495057;
+                color: #fff;
+            }
+</style>
+<body>
+    <div class="sidebar">
+        <h4 class="p-3">API Documentation</h4>
+        <a href="#">Group 1</a>
+        <a href="#">Group 2</a>
+        <a href="#">Group 3</a>
+    </div>
+    <div class="content">
+        <h1>Endpoint Listesi</h1>
+        <p>Burada tüm endpointleri listeleyelim.</p>
+        @foreach (var entity in Model)
+        {
+
+
+            <p onclick="toggleEndpointEntity(this)">
+                <strong>@entity.ClrType.Name</strong>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" style="float:right;margin-right:50px" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1" />
+                </svg>
+            </p>
+
+            <div class="endpoint-list">
+            <div class="endpoint" >
+                <div class="endpoint-header" onclick="toggleEndpoint(this)" style="background-color:#d4edda; padding: 10px; border-radius: 5px;">
+                    <button class="btn" style="background-color: #28a745; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
+                        <strong>GET</strong>
+                    </button>
+                    /api/@entity.ClrType.Name
+                </div>
+                <div class="endpoint-body">
+                    <p><strong>Açıklama:</strong> @entity.ClrType.Name listesini döndürür</p>
+                    <ul>
+                        <li><strong>200:</strong> Başarılı</li>
+                        <li><strong>400:</strong> Hatalı İstek</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)" style="background-color:#d4edda; padding: 10px; border-radius: 5px;">
+                    <button class="btn" style="background-color: #28a745; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
+                        <strong>GET</strong>
+                    </button>
+                    /api/@entity.ClrType.Name/{id}
+                </div>
+                <div class="endpoint-body">
+                    <p><strong>Description:</strong> Id'ye göre @entity.ClrType.Name nesnesi döner</p>
+                    <h6>Parametre:</h6>
+                    <ul>
+                        <li><strong>id</strong>: Zorunlu - Nesne Id'si</li>
+                    </ul>
+                    <h6>Açıklama:</h6>
+                    <ul>
+                        <li><strong>200:</strong> Başarılı</li>
+                        <li><strong>400:</strong> Hatalı İstek</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)" style="background-color:#cfe2ff; padding: 10px; border-radius: 5px;">
+                    <button class="btn" style="background-color: #007bff; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
+                        <strong>POST</strong>
+                    </button>
+                    /api/@entity.ClrType.Name
+                </div>
+                <div class="endpoint-body">
+                    <p><strong>Description:</strong>Yeni bir @entity.ClrType.Name ekler</p>
+                    <h6>Parametreler:</h6>
+                    <ul>
+                        <li><strong>body</strong>: Zorunlu - JSON formatında nesne</li>
+                    </ul>
+                    <h6>Örnek:</h6>
+                    <textarea class="json-input" oninput="autoResize(this)">
+{
+    @foreach (var item in entity.GetProperties())
+    {
+                            
+@GetExample(item,"POST")
+
+    }
+}
+                    </textarea>
+                    <h6>Açıklama:</h6>
+                    <ul>
+                        <li><strong>201:</strong> Eklendi</li>
+                        <li><strong>400:</strong> Hatalı İstek</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)" style="background-color:#fff3cd; padding: 10px; border-radius: 5px;">
+                    <button class="btn" style="background-color: #ffc107; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
+                        <strong>PUT</strong>
+                    </button>
+                    /api/@entity.ClrType.Name/{id}
+                </div>
+                <div class="endpoint-body">
+                    <p><strong>Description:</strong>Id'si verilen nesneyi günceller.</p>
+                    <h6>Parametre:</h6>
+                    <ul>
+                        <li><strong>body</strong>: Zorunlu - JSON formatında nesne.</li>
+                    </ul>
+                    <h6>Examples:</h6>
+                    <textarea class="json-input" oninput="autoResize(this)">
+{
+                    @foreach (var item in entity.GetProperties())
+                    {
+
+                        @GetExample(item, "PUT")
+
+                    }
+}
+                        </textarea>
+                    <h6>Responses:</h6>
+                    <ul>
+                        <li><strong>200:</strong> Updated</li>
+                        <li><strong>400:</strong> Bad Request</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)" style="background-color:#f8d7da; padding: 10px; border-radius: 5px;">
+                    <button class="btn" style="background-color: #dc3545; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
+                        <strong>DELETE</strong>
+                    </button>
+                    /api/@entity.ClrType.Name/{id}
+                </div>
+                <div class="endpoint-body">
+                    <p><strong>Description:</strong> Delete a resource by ID.</p>
+                    <h6>Parameters:</h6>
+                    <ul>
+                        <li><strong>id</strong>: Required - The ID of the resource to delete.</li>
+                    </ul>
+                    <h6>Responses:</h6>
+                    <ul>
+                        <li><strong>200:</strong> Deleted</li>
+                        <li><strong>400:</strong> Bad Request</li>
+                    </ul>
+                </div>
+            </div>
+            </div>
+        }
+    </div>
+
+    <script>
+               window.onload = function () {
+            const textareas = document.querySelectorAll('.json-input');
+            textareas.forEach(textarea => autoResize(textarea));
+
+        };
+
+         
+
+
+             function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+            function toggleEndpoint(element) {
+            const body = element.nextElementSibling;
+            body.style.display = body.style.display === 'block' ? 'none' : 'block';
+
+            // Görünür textarea'ları yeniden boyutlandır
+            if (body.style.display === 'block') {
+                const textareas = body.querySelectorAll('.json-input');
+                textareas.forEach(textarea => autoResize(textarea));
+            }
+        }
+        function toggleEndpointEntity(element) {
+            const endpointList = element.nextElementSibling;
+            endpointList.style.display = endpointList.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</body>
+
+
