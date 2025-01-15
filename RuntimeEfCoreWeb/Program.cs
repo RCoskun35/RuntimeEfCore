@@ -5,7 +5,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 DynamicContextExtensions.DynamicContext(connectionString!);
 // Add services to the container.
 
-
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllersWithViews();
 
 var dbContext = DynamicContextExtensions.dynamicContext;
