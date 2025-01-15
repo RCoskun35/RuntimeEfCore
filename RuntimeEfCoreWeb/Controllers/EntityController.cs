@@ -21,9 +21,10 @@ namespace RuntimeEfCoreWeb.Controllers
         public IActionResult GetById(string entityName, string id)
         {
             var items = DynamicContextExtensions.GetEntity(entityName);
-            var item = items.FirstOrDefault(i => i.GetType().GetProperty("Id").GetValue(i).ToString() == id);
+            var item = items.Where(i => i.GetType().GetProperty("Id").GetValue(i).ToString() == id.ToLower()).AsEnumerable().FirstOrDefault();
             return Ok(item);
         }
+        [HttpPost]
         [HttpPost]
         public IActionResult Post(string entityName, [FromBody] object item)
         {
@@ -33,17 +34,34 @@ namespace RuntimeEfCoreWeb.Controllers
             {
                 return StatusCode(StatusCodes.Status404NotFound, $"Entity type: {entityName} not found");
             }
+
+            // Deserialize the incoming item into a dynamic object
             var deserializedItem = JsonConvert.DeserializeObject(item.ToString(), entityType);
+
             if (deserializedItem == null)
             {
                 return BadRequest("Invalid object format.");
             }
+            Guid newId;
+            // Check if the entity type has an Id property and set it if necessary
+            var idProperty = entityType.GetProperty("Id");
+            if (idProperty != null)
+            {
+                // Generate a new Id (for example, using GUID)
+                 newId = Guid.NewGuid(); // or any other logic for generating Id
+                idProperty.SetValue(deserializedItem, newId);
+            }
+            else
+            {
+                return BadRequest("The entity type does not have an Id property.");
+            }
+
             DynamicContextExtensions.dynamicContext.Add(deserializedItem);
             DynamicContextExtensions.dynamicContext.SaveChanges();
-            return CreatedAtAction(nameof(GetById), new { entityName, id = deserializedItem.GetType().GetProperty("Id")?.GetValue(deserializedItem)?.ToString() }, deserializedItem);
+            return CreatedAtAction(nameof(GetById), new { entityName, id = newId }, deserializedItem);
         }
 
-        
+
         [HttpPut("{id}")]
         public IActionResult Put(string entityName, string id, [FromBody] object item)
         {

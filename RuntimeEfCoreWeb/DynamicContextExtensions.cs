@@ -104,12 +104,12 @@ namespace RuntimeEfCoreWeb
             var entityTypes = dynamicContext.Model.GetEntityTypes();
             Console.WriteLine($"Context contains {entityTypes.Count()} types");
 
-            foreach (var entityType in entityTypes)
-            {
-                var items = (IQueryable<object>)dynamicContext.Query(entityType.Name);
+            //foreach (var entityType in entityTypes)
+            //{
+            //    var items = (IQueryable<object>)dynamicContext.Query(entityType.Name);
 
-                Console.WriteLine($"Entity type: {entityType.Name} contains {items.Count()} items");
-            }
+            //    Console.WriteLine($"Entity type: {entityType.Name} contains {items.Count()} items");
+            //}
         }
 
         public static IEdmModel GetDynamicEdmModel(DbContext context)
