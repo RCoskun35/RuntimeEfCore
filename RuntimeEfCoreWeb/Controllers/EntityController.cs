@@ -11,6 +11,10 @@ namespace RuntimeEfCoreWeb.Controllers
     [EnableQuery]
     public class EntityController : ControllerBase
     {
+        public EntityController(IConfiguration configuration)
+        {
+            DynamicContextExtensions.DynamicContext(configuration.GetConnectionString("DefaultConnection")!);
+        }
         [HttpGet]
         public IActionResult Get(string entityName)
         {

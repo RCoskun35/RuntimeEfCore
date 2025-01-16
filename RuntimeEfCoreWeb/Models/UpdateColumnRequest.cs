@@ -1,7 +1,6 @@
-﻿namespace RuntimeEfCoreWeb.Controllers
+﻿namespace RuntimeEfCoreWeb.Models
 {
-    public partial class DynamicTableController
-    {
+ 
         public class UpdateColumnRequest
         {
             /// <summary>
@@ -24,5 +23,4 @@
             /// </summary>
             public string NewDataType { get; set; }
         }
-    }
 }

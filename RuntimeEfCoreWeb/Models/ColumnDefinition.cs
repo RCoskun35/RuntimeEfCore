@@ -1,7 +1,5 @@
-﻿namespace RuntimeEfCoreWeb.Controllers
+﻿namespace RuntimeEfCoreWeb.Models
 {
-    public partial class DynamicTableController
-    {
         public class ColumnDefinition
         {
             /// <summary>
@@ -30,4 +28,4 @@
             public bool IsIdentity { get; set; }
         }
     }
-}
+

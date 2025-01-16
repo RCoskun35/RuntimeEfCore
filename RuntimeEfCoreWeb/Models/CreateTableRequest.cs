@@ -1,18 +1,16 @@
-﻿namespace RuntimeEfCoreWeb.Controllers
+﻿
+namespace RuntimeEfCoreWeb.Models
 {
-    public partial class DynamicTableController
+    public class CreateTableRequest
     {
-        public class CreateTableRequest
-        {
-            /// <summary>
-            /// Name of the table to create
-            /// </summary>
-            public string TableName { get; set; }
+        /// <summary>
+        /// Name of the table to create
+        /// </summary>
+        public string TableName { get; set; }
 
-            /// <summary>
-            /// List of columns to create in the table
-            /// </summary>
-            public List<ColumnDefinition> Columns { get; set; }
-        }
+        /// <summary>
+        /// List of columns to create in the table
+        /// </summary>
+        public List<ColumnDefinition> Columns { get; set; }
     }
 }

@@ -8,18 +8,15 @@ namespace RuntimeEfCoreWeb.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        IConfiguration _configuration;
         public HomeController(ILogger<HomeController> logger,IConfiguration configuration)
         {
             _logger = logger;
-            _configuration = configuration;
+            DynamicContextExtensions.DynamicContext(configuration.GetConnectionString("DefaultConnection")!);
         }
+     
 
         public IActionResult Index()
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            DynamicContextExtensions.DynamicContext(connectionString!);
-
             var entities = DynamicContextExtensions.dynamicContext.Model.GetEntityTypes().ToList();
             return View(entities);
         }

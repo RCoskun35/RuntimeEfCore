@@ -4,12 +4,13 @@ using RuntimeEfCoreWeb.Models;
 
 namespace RuntimeEfCoreWeb.Controllers
 {
-    public partial class DynamicTableController : Controller
+    public  class DynamicTableController : Controller
     {
         private readonly DynamicTableService _dynamicTableService;
-
-        public DynamicTableController( DynamicTableService dynamicTableService)
+       
+        public DynamicTableController(IConfiguration configuration, DynamicTableService dynamicTableService)
         {
+            DynamicContextExtensions.DynamicContext(configuration.GetConnectionString("DefaultConnection")!);
             _dynamicTableService = dynamicTableService;
         }
 
