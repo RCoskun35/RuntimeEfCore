@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore.Scaffolding.Internal;
 using Bricelam.EntityFrameworkCore.Design;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using RuntimeEfCoreWeb.Controllers;
 
 namespace RuntimeEfCoreWeb
 {

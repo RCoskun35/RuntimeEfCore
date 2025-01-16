@@ -4,6 +4,7 @@ using RuntimeEfCoreWeb;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddScoped<DynamicTableService>();
 DynamicContextExtensions.DynamicContext(connectionString!);
 // Add services to the container.
 

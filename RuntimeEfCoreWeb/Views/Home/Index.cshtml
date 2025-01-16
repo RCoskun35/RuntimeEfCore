@@ -6,7 +6,7 @@
 @{
     string GetExample(IProperty item,string method)
     {
-
+        Console.WriteLine(item.ClrType.Name+" " + item.Name);
         var result = "";
         if (item.ClrType.Name == "Guid" && method == "PUT")
         {
@@ -32,12 +32,10 @@
         {
             result = "\"" + item.Name + "\" : " + false + ",\n";
         }
-        else if (item.ClrType.Name == "Nullable")
+        else if (item.ClrType.Name == "Nullable" || item.ClrType.Name == "Nullable`1")
         {
-            result = "\"" + item.Name + "\":" + null + ",\n";
+            result = "\"" + item.Name + "\":" + "aaa" + ",\n";
         }
-
-
         return result;
     }
 }
@@ -53,23 +51,6 @@
     }
     body {
     font-family: Arial, sans-serif;
-    }
-    .sidebar {
-    width: 250px;
-    height: 100vh;
-    background-color: #343a40;
-    color: #fff;
-    position: fixed;
-    }
-    .sidebar a {
-    color: #adb5bd;
-    text-decoration: none;
-    padding: 10px 15px;
-    display: block;
-    }
-    .sidebar a:hover {
-    background-color: #495057;
-    color: #fff;
     }
     .content {
     margin-left: 250px;
@@ -94,37 +75,10 @@
         display: none; 
     }
 
-    .sidebar {
-        width: 250px;
-        height: 100vh; /* Tam yükseklik */
-        background-color: #343a40;
-        color: #fff;
-        position: fixed; /* Sabit konum */
-        top: 55px; /* Üstten hizala */
-        left: 0; /* Soldan hizala */
-        overflow-y: auto; /* Dikey kaydırma */
-    }
-
-        .sidebar a {
-            color: #adb5bd;
-            text-decoration: none;
-            padding: 10px 15px;
-            display: block;
-        }
-
-            .sidebar a:hover {
-                background-color: #495057;
-                color: #fff;
-            }
 </style>
-<body>
-    <div class="sidebar">
-        <h4 class="p-3">API Documentation</h4>
-        <a href="#">Group 1</a>
-        <a href="#">Group 2</a>
-        <a href="#">Group 3</a>
-    </div>
-    <div class="content">
+
+  
+    <div class="">
         <h1>Endpoint Listesi</h1>
         <p>Burada tüm endpointleri listeleyelim.</p>
         @foreach (var entity in Model)
@@ -290,6 +244,5 @@
             endpointList.style.display = endpointList.style.display === 'block' ? 'none' : 'block';
         }
     </script>
-</body>
 
 

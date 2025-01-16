@@ -25,7 +25,6 @@ namespace RuntimeEfCoreWeb.Controllers
             return Ok(item);
         }
         [HttpPost]
-        [HttpPost]
         public IActionResult Post(string entityName, [FromBody] object item)
         {
             var entityType = DynamicContextExtensions.dynamicContext.Model.FindEntityType($"TypedDataContext.Models.{entityName}")?.ClrType;

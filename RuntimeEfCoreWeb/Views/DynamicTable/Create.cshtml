@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Create New Table";
+}
+
+<div class="container mt-4">
+    <h2>Create New Table</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="createTableForm">
+                <div class="mb-3">
+                    <label for="tableName" class="form-label">Table Name</label>
+                    <input type="text" class="form-control" id="tableName" required>
+                </div>
+
+                <div id="columnsContainer">
+                    <h4>Columns</h4>
+                    <div class="column-definition mb-3">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control column-name" placeholder="Column Name" required>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select column-type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="INT">INT</option>
+                                    <option value="VARCHAR(255)">VARCHAR(255)</option>
+                                    <option value="DATETIME">DATETIME</option>
+                                    <option value="DECIMAL(18,2)">DECIMAL(18,2)</option>
+                                    <option value="BIT">BIT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input column-required" type="checkbox">
+                                    <label class="form-check-label">Required</label>
+                                </div>
+                                @* <div class="form-check form-check-inline">
+                                    <input class="form-check-input column-primary" type="checkbox">
+                                    <label class="form-check-label">Primary Key</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input column-identity" type="checkbox">
+                                    <label class="form-check-label">Identity</label>
+                                </div> *@
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger btn-sm remove-column">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-info mb-3" id="addColumn">
+                    <i class="fas fa-plus"></i> Add Column
+                </button>
+
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Create Table
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Yeni kolon ekleme
+            $("#addColumn").click(function() {
+                const newColumn = $(".column-definition").first().clone();
+                newColumn.find("input").val("");
+                newColumn.find("input[type='checkbox']").prop("checked", false);
+                $("#columnsContainer").append(newColumn);
+            });
+
+            // Kolon silme
+            $(document).on("click", ".remove-column", function() {
+                if ($(".column-definition").length > 1) {
+                    $(this).closest(".column-definition").remove();
+                } else {
+                    alert("At least one column is required");
+                }
+            });
+
+            // Form gönderimi
+            $("#createTableForm").submit(function(e) {
+                e.preventDefault();
+
+                const columns = [];
+                $(".column-definition").each(function() {
+                    columns.push({
+                        name: $(this).find(".column-name").val(),
+                        dataType: $(this).find(".column-type").val(),
+                        isRequired: $(this).find(".column-required").is(":checked"),
+                        isPrimaryKey: $(this).find(".column-primary").is(":checked"),
+                        isIdentity: $(this).find(".column-identity").is(":checked")
+                    });
+                });
+
+                const data = {
+                    tableName: $("#tableName").val(),
+                    columns: columns
+                };
+
+                $.ajax({
+                    url: '@Url.Action("Create")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        if (response.success) {
+                            alert("Table created successfully!");
+                            window.location.href = '@Url.Action("Index")';
+                        }
+                    },
+                    error: function(xhr) {
+                        alert("Error: " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+} 

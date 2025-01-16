@@ -1,0 +1,34 @@
+﻿
+@{
+    ViewData["Title"] = "AddColumn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>AddColumn</h1>
+
+<div class="container mt-5">
+    <h2>@ViewBag.TableName için Sütun Ekle</h2>
+    <form asp-action="SaveColumn" method="post">
+        <div class="form-group">
+            <label for="columnName">Sütun Adı</label>
+            <input type="text" class="form-control" id="columnName" name="ColumnName" required>
+            <input type="hidden" class="form-control" id="tableName" value="@ViewBag.TableName" name="TableName" >
+        </div>
+        <div class="form-group">
+            <label for="columnType">Sütun Tipi</label>
+            <select class="form-control" id="columnType" name="ColumnType" required>
+                <option value="">Select Type</option>
+                <option value="INT">INT</option>
+                <option value="VARCHAR(255)">VARCHAR(255)</option>
+                <option value="DATETIME">DATETIME</option>
+                <option value="DECIMAL(18,2)">DECIMAL(18,2)</option>
+                <option value="BIT">BIT</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="isRequired">Zorunlu mu?</label>
+            <input type="checkbox" id="isRequired" name="IsRequired">
+        </div>
+        <button type="submit" class="btn btn-primary">Sütunu Ekle</button>
+    </form>
+</div>
