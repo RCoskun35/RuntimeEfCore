@@ -88,14 +88,13 @@
         @foreach (var entity in Model)
         {
 
-
-            <p onclick="toggleEndpointEntity(this)" id="entityName">
-                <strong>@entity.ClrType.Name</strong>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" style="float:right;margin-right:50px" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1" />
-                </svg>
-            </p>
-
+        <p onclick="toggleEndpointEntity(this)" id="entityName" style="background-color:#d4edda; padding: 10px; margin: 0;" class="mb-2">
+            <strong >@entity.ClrType.Name</strong>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" style="float:right;margin-right:50px" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1" />
+            </svg>
+        </p>
+            <hr />
             <div class="endpoint-list">
             <div class="endpoint" >
                 <div class="endpoint-header" onclick="toggleEndpoint(this)" style="background-color:#d4edda; padding: 10px; border-radius: 5px;">
@@ -244,7 +243,7 @@
             }
         }
         function toggleEndpointEntity(element) {
-            const endpointList = element.nextElementSibling;
+        const endpointList = element.nextElementSibling.nextElementSibling;
             endpointList.style.display = endpointList.style.display === 'block' ? 'none' : 'block';
         }
     </script>
