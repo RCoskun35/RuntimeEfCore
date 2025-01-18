@@ -4,15 +4,23 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+
+<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
 <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
 <div class="row">
     <div class="col-6"> <button class="btn btn-outline-primary" id="btnAdd">Ekle</button></div>
     
 </div>
 <div class="row mt-4">
-    <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
+    <table id="table"
+           data-search="true"
+           data-show-columns="true"
+           data-show-multi-sort="true"
+        class="table table-bordered" style="table-layout: fixed; width: 100%;">
         <thead>
             <tr>
                 @foreach (var prop in Model.FirstOrDefault()?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0])
@@ -72,8 +80,29 @@
     </div>
 </div>
 
+<!-- Güncelleme Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateForm">
+                    <!-- Dinamik inputlar buraya eklenecek -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary" id="btnUpdateSave">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+
         $(document).ready(function () {
         const apiUrl = "http://localhost:5295/api/Metadata";
         const entityName = "@Model.FirstOrDefault()?.GetType().Name"; // Entity Name alınır
@@ -159,6 +188,110 @@
                 },
             });
         });
+
+        var updateId = "";
+        var createdDate = "";
+          $(".btn-warning").click(function () {
+        // Satırdaki değerleri al
+        const row = $(this).closest("tr");
+        const rowData = {};
+
+        row.find("td").each(function (index) {
+            const columnName = $("thead th").eq(index).text(); // Sütun adını al
+            const value = $(this).text().trim();
+            rowData[columnName] = value;
+        });
+
+        // Güncelleme modal'ındaki formu temizle
+        $("#updateForm").empty();
+
+        // Dinamik olarak inputları oluştur ve mevcut değerleri doldur
+         const columns = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+            ((System.Reflection.PropertyInfo[])Model.FirstOrDefault()?.GetType().GetProperties())
+            .Where(p => !typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType) || p.PropertyType == typeof(string))
+            .Select(p => new { Name = p.Name, Type = p.PropertyType.Name })
+        ));
+
+        columns.forEach(column => {
+            const value = rowData[column.Name] || ""; // Mevcut değerleri al
+            
+            if (column.Name.toLowerCase() !== "id" && column.Name.toLowerCase() !== "createdat" ) { // ID alanını hariç tut
+                let inputType = "text";
+                let className ="form-control";
+                // Tip kontrolü ve uygun input tipi belirleme
+                switch (column.Type.toLowerCase()) {
+                    case "int32":
+                    case "int64":
+                    case "decimal":
+                        inputType = "number";
+                        break;
+                    case "datetime":
+                        inputType = "date";
+                        console.log(value);
+                        break;
+                    case "boolean":
+                        inputType = "checkbox";
+                        className="";
+                        break;
+                    default:
+                        inputType = "text";
+                }
+
+                
+
+                $("#updateForm").append(`
+                    <div class="mb-3">
+                        <label for="${column.Name}" class="form-label">${column.Name}</label>
+                        <input type="${inputType}" class="${className}" id="${column.Name}" name="${column.Name}" value="${value}">
+                    </div>
+                `);
+            }
+            else{
+                if(column.Name.toLowerCase() === "id")
+                    updateId = value;
+                if(column.Name.toLowerCase() === "createdat")
+                    createdDate = value;
+            }
+        });
+
+        // Güncelleme modal'ını aç
+        $("#updateModal").modal("show");
+    });
+
+    // Güncelleme işlemini kaydet
+    $("#btnUpdateSave").click(function () {
+        const formData = {};
+
+        // Formdaki inputları oku
+        $("#updateForm")
+            .find("input")
+            .each(function () {
+                const name = $(this).attr("name");
+                const value =
+                    $(this).attr("type") === "checkbox"
+                        ? $(this).is(":checked")
+                        : $(this).val();
+
+                formData[name] = value;
+            });
+            formData["CreatedAt"] = createdDate;
+           
+        // AJAX PUT isteği
+        $.ajax({
+            url: `${apiUrl}/${entityName}/${updateId}`,
+            type: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify(formData),
+            success: function (response) {
+                alert("Kayıt başarıyla güncellendi!");
+                location.reload(); // Sayfayı yeniden yükle
+            },
+            error: function (error) {
+                alert("Bir hata oluştu!");
+                console.error(error);
+            },
+        });
+    });
     });
 
 </script>

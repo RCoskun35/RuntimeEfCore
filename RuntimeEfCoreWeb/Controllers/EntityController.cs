@@ -109,9 +109,15 @@ namespace RuntimeEfCoreWeb.Controllers
                 {
                     return NotFound($"Item with Id '{id}' not found.");
                 }
-
+                var settings = new JsonSerializerSettings
+                {
+                    DateFormatString = "dd.MM.yyyy HH:mm:ss", // Gelen tarih formatı
+                    DateTimeZoneHandling = DateTimeZoneHandling.Local, // Zaman dilimi
+                    MissingMemberHandling = MissingMemberHandling.Ignore, // Eksik üyeler için hata fırlatma
+                    NullValueHandling = NullValueHandling.Ignore // Null değerleri yoksay
+                };
                 // Deserialize the incoming item to the correct entity type
-                var updatedItem = JsonConvert.DeserializeObject(item.ToString(), entityType);
+                var updatedItem = JsonConvert.DeserializeObject(item.ToString(), entityType, settings);
                 if (updatedItem == null)
                 {
                     return BadRequest("Invalid object format.");
