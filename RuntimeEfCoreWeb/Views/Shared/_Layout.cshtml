@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var entites = DynamicContextExtensions.dynamicContext.Model.GetEntityTypes().ToList();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -33,7 +37,7 @@
     </header>
     <div class="container-fluid">
         <div class="row flex-nowrap">
-            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+            <div class="col-auto col-md-2 col-xl-1 px-sm-1 px-0 bg-dark">
                 <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
                     <a href="/" class="nav-link px-0 align-middle">
                         <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">Endpoint Listesi</span>
@@ -44,8 +48,21 @@
                                 <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">Tablolar</span>
                             </a>
                         </li>
+                        <li>----------------</li>
+                        <li class="mt-5">Dinamik Alanlar</li>
+                        @foreach (var entity in entites)
+                        {
+                            <li>
+                                <a href="/Udt/@entity.ClrType.Name" class="nav-link px-0 align-middle">
+                                    <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">@entity.ClrType.Name</span>
+                                </a>
+                            </li>
+                        }
+
+                       
                     </ul>
                     <hr>
+                  
                  
                 </div>
             </div>
