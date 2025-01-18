@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Linq;
 
 namespace RuntimeEfCoreWeb.Controllers
 {
-    [Route("api/{entityName}")]
+    [Route("api/Metadata/{entityName}")]
     [ApiController]
     [EnableQuery]
     public class EntityController : ControllerBase
@@ -45,18 +47,28 @@ namespace RuntimeEfCoreWeb.Controllers
             {
                 return BadRequest("Invalid object format.");
             }
-            Guid newId;
+            Guid newId= Guid.NewGuid(); ;
             // Check if the entity type has an Id property and set it if necessary
             var idProperty = entityType.GetProperty("Id");
             if (idProperty != null)
             {
-                // Generate a new Id (for example, using GUID)
-                 newId = Guid.NewGuid(); // or any other logic for generating Id
                 idProperty.SetValue(deserializedItem, newId);
             }
             else
             {
-                return BadRequest("The entity type does not have an Id property.");
+                var properties = entityType.GetProperties();
+                var columnNames = string.Join(",", properties.Select(p => p.Name));
+                var values = string.Join(",", properties.Select(p => $"@{p.Name}"));
+                var sql = $"INSERT INTO {entityName} ({columnNames}) VALUES ({values})";
+
+                var parameters = properties.Select(p =>
+                    new SqlParameter($"@{p.Name}", p.PropertyType.IsValueType ? p.GetValue(deserializedItem) ?? DBNull.Value : (object)p.GetValue(deserializedItem) ?? DBNull.Value))
+                    .ToArray();
+
+                DynamicContextExtensions.dynamicContext.Database.ExecuteSqlRaw(sql, parameters);
+
+                return Ok($"Record added to {entityName} without tracking.");
+
             }
 
             DynamicContextExtensions.dynamicContext.Add(deserializedItem);

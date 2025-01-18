@@ -101,7 +101,7 @@
                     <button class="btn" style="background-color: #28a745; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
                         <strong>GET</strong>
                     </button>
-                    /api/@entity.ClrType.Name
+                    /api/Metadata/@entity.ClrType.Name
                 </div>
                 <div class="endpoint-body">
                     <p><strong>Açıklama:</strong> @entity.ClrType.Name listesini döndürür</p>
@@ -116,7 +116,7 @@
                     <button class="btn" style="background-color: #28a745; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
                         <strong>GET</strong>
                     </button>
-                    /api/@entity.ClrType.Name/{id}
+                    /api/Metadata/@entity.ClrType.Name/{id}
                 </div>
                 <div class="endpoint-body">
                     <p><strong>Description:</strong> Id'ye göre @entity.ClrType.Name nesnesi döner</p>
@@ -136,7 +136,7 @@
                     <button class="btn" style="background-color: #007bff; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
                         <strong>POST</strong>
                     </button>
-                    /api/@entity.ClrType.Name
+                    /api/Metadata/@entity.ClrType.Name
                 </div>
                 <div class="endpoint-body">
                     <p><strong>Description:</strong>Yeni bir @entity.ClrType.Name ekler</p>
@@ -145,7 +145,7 @@
                         <li><strong>body</strong>: Zorunlu - JSON formatında nesne</li>
                     </ul>
                     <h6>Örnek:</h6>
-                    <textarea class="json-input" oninput="autoResize(this)">
+                    <textarea class="json-input" oninput="autoResize(this)" style="background-color:#d4edda;">
 {
     @foreach (var item in entity.GetProperties())
     {
@@ -167,7 +167,7 @@
                     <button class="btn" style="background-color: #ffc107; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
                         <strong>PUT</strong>
                     </button>
-                    /api/@entity.ClrType.Name/{id}
+                    /api/Metadata/@entity.ClrType.Name/{id}
                 </div>
                 <div class="endpoint-body">
                     <p><strong>Description:</strong>Id'si verilen nesneyi günceller.</p>
@@ -176,7 +176,7 @@
                         <li><strong>body</strong>: Zorunlu - JSON formatında nesne.</li>
                     </ul>
                     <h6>Examples:</h6>
-                    <textarea class="json-input" oninput="autoResize(this)">
+                    <textarea class="json-input" oninput="autoResize(this)" style="background-color:#d4edda;">
 {
                     @foreach (var item in entity.GetProperties())
                     {
@@ -198,7 +198,7 @@
                     <button class="btn" style="background-color: #dc3545; color: white; border: none; border-radius: 5px; padding: 5px 10px;">
                         <strong>DELETE</strong>
                     </button>
-                    /api/@entity.ClrType.Name/{id}
+                    /api/Metadata/@entity.ClrType.Name/{id}
                 </div>
                 <div class="endpoint-body">
                     <p><strong>Description:</strong> Delete a resource by ID.</p>
