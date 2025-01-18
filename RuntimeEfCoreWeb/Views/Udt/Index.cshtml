@@ -37,7 +37,7 @@
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
+                <tr data-id="@item.Id">
                     @foreach (var prop in item.GetType().GetProperties())
                     {
                         if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType) || prop.PropertyType == typeof(string))
@@ -47,8 +47,8 @@
 
                     }
                     <td style="min-width:170px; max-width:180px; width: 180px;">
-                        <button class="btn btn-warning"> Güncelle</button>
-                        <button class="btn btn-danger" style="float:right;margin-left:10px"> Sil</button>
+                        <button class="btn btn-warning btn-update"> Güncelle</button>
+                        <button class="btn btn-danger btn-delete" style="float:right;margin-left:10px"> Sil</button>
                     </td>
                 </tr>
 
@@ -102,10 +102,10 @@
 </div>
 
 <script>
+    const apiUrl = "http://localhost:5295/api/Metadata";
+        const entityName = "@Model.FirstOrDefault()?.GetType().Name"; // Entity Name alınır
 
         $(document).ready(function () {
-        const apiUrl = "http://localhost:5295/api/Metadata";
-        const entityName = "@Model.FirstOrDefault()?.GetType().Name"; // Entity Name alınır
 
         // Ekle butonuna tıklandığında modal açılır
         $("#btnAdd").click(function () {
@@ -293,5 +293,23 @@
         });
     });
     });
+        $(document).on('click', '.btn-delete', function () {
 
+        const row = $(this).closest('tr'); // Butonun bulunduğu satırı seç
+        const id = row.data('id'); // Satırdan Id değerini al
+        
+        if (confirm("Bu kaydı silmek istediğinize emin misiniz?")) {
+            $.ajax({
+                url: `${apiUrl}/${entityName}/${id}`,
+                type: 'DELETE',
+                success: function (response) {
+                    alert(response); // API'den gelen mesajı göster
+                    row.remove(); // Silinen satırı tablodan kaldır
+                },
+                error: function (xhr) {
+                    alert(`Silme işlemi sırasında bir hata oluştu: ${xhr.responseText}`);
+                }
+            });
+        }
+    });
 </script>
