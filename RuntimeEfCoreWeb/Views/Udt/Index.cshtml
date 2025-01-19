@@ -194,7 +194,7 @@
 
         row.find("td").each(function (index) {
             const columnName = $("thead th").eq(index).text(); // Sütun adını al
-            const value = $(this).text().trim();
+            var value = $(this).text().trim();
             rowData[columnName] = value;
         });
 
@@ -210,21 +210,23 @@
 
 
         columns.forEach(column => {
-            const value = rowData[column.Name] || ""; // Mevcut değerleri al
-
+            var value = rowData[column.Name] || ""; // Mevcut değerleri al
             if (column.Name.toLowerCase() !== "id" && column.Name.toLowerCase() !== "createdat" ) { // ID alanını hariç tut
                 let inputType = "text";
                 let className ="form-control";
                 // Tip kontrolü ve uygun input tipi belirleme
+                console.log(column.Name,column.Type.toLowerCase(),value,value.replace(',','.'));
                 switch (column.Type.toLowerCase()) {
                     case "int32":
                     case "int64":
-                    case "decimal":
                         inputType = "number";
+                        break;
+                    case "decimal":
+                    value =parseFloat(value.replace(',','.'));
+                    inputType = "number";
                         break;
                     case "datetime":
                         inputType = "date";
-                        console.log(value);
                         break;
                     case "boolean":
                         inputType = "checkbox";
@@ -233,7 +235,6 @@
                     default:
                         inputType = "text";
                 }
-
 
 
                 $("#updateForm").append(`
