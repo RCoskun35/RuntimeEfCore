@@ -15,7 +15,9 @@ namespace RuntimeEfCoreWeb.Controllers
         {
 
             var items = DynamicContextExtensions.GetEntity(entityName);
-            return View(items);
+            if( items.Count() > 0)
+                return View(items);
+            return RedirectToAction("Index","Home");
         }
     }
 }

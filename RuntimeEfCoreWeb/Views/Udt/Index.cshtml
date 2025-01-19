@@ -10,17 +10,16 @@
 <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
 <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 
-
 <div class="row">
     <div class="col-6"> <button class="btn btn-outline-primary" id="btnAdd">Ekle</button></div>
-    
 </div>
+
 <div class="row mt-4">
     <table id="table"
            data-search="true"
            data-show-columns="true"
            data-show-multi-sort="true"
-        class="table table-bordered" style="table-layout: fixed; width: 100%;">
+           class="table table-bordered" style="table-layout: fixed; width: 100%;">
         <thead>
             <tr>
                 @foreach (var prop in Model.FirstOrDefault()?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0])
@@ -55,9 +54,7 @@
             }
         </tbody>
     </table>
-
 </div>
-
 
 <!-- Modal -->
 <div class="modal fade" id="entityModal" tabindex="-1" aria-labelledby="entityModalLabel" aria-hidden="true">
@@ -79,7 +76,6 @@
         </div>
     </div>
 </div>
-
 <!-- Güncelleme Modal -->
 <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -103,8 +99,8 @@
 
 <script>
     const apiUrl = "http://localhost:5295/api/Metadata";
-        const entityName = "@Model.FirstOrDefault()?.GetType().Name"; // Entity Name alınır
 
+        const entityName = "@Model.FirstOrDefault()?.GetType().Name"; // Entity Name alınır
         $(document).ready(function () {
 
         // Ekle butonuna tıklandığında modal açılır
@@ -113,11 +109,11 @@
             $("#entityForm").empty();
 
             // Dinamik olarak inputları oluştur
-                const columns = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
-                        ((System.Reflection.PropertyInfo[])Model.FirstOrDefault()?.GetType().GetProperties())
-                        .Where(p => !typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType) ||               p.PropertyType == typeof(string))
-                        .Select(p => new { Name = p.Name, Type = p.PropertyType.Name })
-                    ));
+                  const columns = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                    ((System.Reflection.PropertyInfo[])Model.FirstOrDefault()?.GetType().GetProperties())
+                    .Where(p => !typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType) || p.PropertyType == typeof(string))
+                    .Select(p => new { Name = p.Name, Type = p.PropertyType.Name })
+                ));
 
             columns.forEach(column => {
                 if (column.Name.toLowerCase() !== "id") { // ID alanını hariç tut
@@ -206,15 +202,16 @@
         $("#updateForm").empty();
 
         // Dinamik olarak inputları oluştur ve mevcut değerleri doldur
-         const columns = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
-            ((System.Reflection.PropertyInfo[])Model.FirstOrDefault()?.GetType().GetProperties())
-            .Where(p => !typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType) || p.PropertyType == typeof(string))
-            .Select(p => new { Name = p.Name, Type = p.PropertyType.Name })
-        ));
+                 const columns = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                 ((System.Reflection.PropertyInfo[])Model.FirstOrDefault()?.GetType().GetProperties())
+                 .Where(p => !typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType) || p.PropertyType == typeof(string))
+                 .Select(p => new { Name = p.Name, Type = p.PropertyType.Name })
+             ));
+
 
         columns.forEach(column => {
             const value = rowData[column.Name] || ""; // Mevcut değerleri al
-            
+
             if (column.Name.toLowerCase() !== "id" && column.Name.toLowerCase() !== "createdat" ) { // ID alanını hariç tut
                 let inputType = "text";
                 let className ="form-control";
@@ -237,7 +234,7 @@
                         inputType = "text";
                 }
 
-                
+
 
                 $("#updateForm").append(`
                     <div class="mb-3">
@@ -275,7 +272,7 @@
                 formData[name] = value;
             });
             formData["CreatedAt"] = createdDate;
-           
+
         // AJAX PUT isteği
         $.ajax({
             url: `${apiUrl}/${entityName}/${updateId}`,
@@ -297,7 +294,7 @@
 
         const row = $(this).closest('tr'); // Butonun bulunduğu satırı seç
         const id = row.data('id'); // Satırdan Id değerini al
-        
+
         if (confirm("Bu kaydı silmek istediğinize emin misiniz?")) {
             $.ajax({
                 url: `${apiUrl}/${entityName}/${id}`,
@@ -312,4 +309,5 @@
             });
         }
     });
+
 </script>
